@@ -1,3 +1,148 @@
+# Utility Billing System API
+
+Spring Boot backend for a WASAC/REG-style utility billing system. It supports JWT authentication, role-based authorization, customer and meter management, readings, tariffs, bills, payments, notifications, Swagger documentation, PostgreSQL, and Flyway migrations.
+
+## Tech Stack
+
+Java 17, Spring Boot 3, Spring Security 6, JWT with `jjwt`, Spring Data JPA, PostgreSQL, Flyway, Lombok, MapStruct, Swagger/OpenAPI 3, and Maven.
+
+## Seeded Admin
+
+The required administrator is seeded and normalized at startup with BCrypt:
+
+- Email: `jolieprincesseishimwe@gmail.com`
+- Password: `Jolie@123`
+- Full name: `Jolie Princesse Ishimwe`
+- Phone: `+250785060644`
+- Role: `ROLE_ADMIN`
+
+The admin can upgrade users to `ROLE_OPERATOR`, `ROLE_FINANCE`, or `ROLE_CUSTOMER` through `PATCH /api/users/{id}/role`.
+
+## Setup
+
+Create a PostgreSQL database:
+
+```sql
+CREATE DATABASE utility_billing;
+```
+
+Configure environment variables if your database is not using the defaults:
+
+```bash
+DB_URL=jdbc:postgresql://localhost:5432/utility_billing
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+JWT_SECRET=Zrjv9gYwM8m2z6zL0i8wZzN5rX9Y3qYhP8Y4w8r3X2I=
+```
+
+Run the application:
+
+```bash
+mvn spring-boot:run
+```
+
+Open Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+## Authentication Flow
+
+Register a customer account with phone number, National ID, and address. The system creates an inactive user and inactive customer profile, then sends the OTP to the registered email address. After OTP verification, both the user account and customer profile become active. In Swagger, click **Authorize** after login and enter:
+
+```text
+Bearer <jwt-token>
+```
+
+Registration request example:
+
+```json
+{
+  "fullName": "Test Customer",
+  "email": "customer1@example.com",
+  "phoneNumber": "+250788123456",
+  "nationalId": "1198000000000003",
+  "address": "Kigali, Nyarugenge",
+  "password": "Customer@123"
+}
+```
+
+## ERD
+
+This ERD shows the relational database design used by the Flyway migrations:
+
+```mermaid
+erDiagram
+    APP_USERS ||--o{ METER_READINGS : records
+    APP_USERS ||--o{ BILLS : approves
+    APP_USERS ||--o{ PAYMENTS : records
+    CUSTOMERS ||--o{ METERS : owns
+    CUSTOMERS ||--o{ BILLS : receives
+    CUSTOMERS ||--o{ NOTIFICATIONS : receives
+    METERS ||--o{ METER_READINGS : has
+    METERS ||--o{ BILLS : billed
+    METER_READINGS ||--|| BILLS : generates
+    TARIFFS ||--o{ TARIFF_TIERS : contains
+    TARIFFS ||--o{ BILLS : prices
+    BILLS ||--o{ PAYMENTS : paid_by
+    BILLS ||--o{ NOTIFICATIONS : triggers
+```
+
+## Spring Boot Flow
+
+This flow summarizes how requests move through the backend:
+
+```mermaid
+flowchart LR
+    Swagger[Swagger UI] --> Controller[REST Controllers]
+    Controller --> Security[JWT Filter and Method Security]
+    Security --> Service[Service Layer Business Rules]
+    Service --> Repository[Spring Data JPA Repositories]
+    Repository --> Database[(PostgreSQL)]
+    Database --> Triggers[Flyway Triggers]
+    Triggers --> Notifications[Notifications Table]
+```
+
+## Main API Groups
+
+- Auth: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/verify-otp`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`
+- Users: `GET /api/users`, `GET /api/users/me`, `GET /api/users/{id}`, `PATCH /api/users/{id}/role`, `PATCH /api/users/{id}/role/revoke`, `DELETE /api/users/{id}`
+- Customers: `POST /api/customers`, `GET /api/customers`, `GET /api/customers/me`, `PUT /api/customers/me`, `GET /api/customers/{id}`, `PUT /api/customers/{id}`, `PATCH /api/customers/{id}/status`
+- Meters: `POST /api/meters`, `GET /api/meters`, `GET /api/meters/customer/{customerId}`, `PATCH /api/meters/{id}/status`
+- Meter Readings: `POST /api/meter-readings`, `GET /api/meter-readings`, `GET /api/meter-readings/{id}`, `GET /api/meter-readings/meter/{meterId}`
+- Tariffs: `POST /api/tariffs`, `GET /api/tariffs`, `GET /api/tariffs/active`, `PUT /api/tariffs/{id}`
+- Bills: `POST /api/bills/generate/{meterReadingId}`, `POST /api/bills/{id}/approve`, `GET /api/bills`, `GET /api/bills/{id}`, `GET /api/bills/{id}/pdf`, `GET /api/bills/customer/{customerId}`, `GET /api/bills/reference/{reference}`
+- Payments: `POST /api/payments`, `GET /api/payments`, `GET /api/payments/bill/{billId}`, `GET /api/payments/customer/{customerId}`
+- Notifications: `GET /api/notifications/customer/{customerId}`, `PATCH /api/notifications/{id}/read`
+
+## Role Summary
+
+- `ROLE_ADMIN`: administrative endpoints, user lookup, user deletion, user role upgrades/revocations, customer activation/deactivation, tariff configuration
+- `ROLE_OPERATOR`: customer/meter lookup and meter reading capture
+- `ROLE_FINANCE`: bill generation/approval and payment recording
+- `ROLE_CUSTOMER`: own bills, own payments, own notifications
+
+## Business Rules Covered
+
+- Duplicate user email, customer national ID, meter number, and transaction reference are rejected.
+- Phone numbers must start with `+` and contain 10 to 12 digits.
+- National IDs must contain exactly 16 digits.
+- Registration sends a 6-digit OTP email, and login is blocked until the OTP is verified.
+- Customer self-registration creates both an inactive user account and inactive customer profile.
+- All self-registered users start as `ROLE_CUSTOMER`; admin upgrades roles when a user becomes operator or finance.
+- Admin customer activation/deactivation also updates the matching user login status.
+- Customers can view their own account and view/update their own customer profile.
+- Role upgrades and role revocations send email notifications to the affected user.
+- Customers can download their own bill as a styled PDF.
+- Inactive meters cannot receive readings.
+- Current reading must be greater than previous reading.
+- Only one reading is allowed per meter per month/year.
+- Inactive customers cannot receive bills.
+- Tariffs are versioned, with new active versions deactivating old versions.
+- Bills are generated from readings using flat or tiered pricing, fixed charges, and VAT.
+- Payments can be partial or full and cannot exceed the outstanding balance.
+- PostgreSQL triggers insert notifications when bills are approved and fully paid.
 # JavaT — Spring Boot Template
 
 A production-ready Spring Boot template with authentication, user management, email notifications, database migrations, and a clean API layer built in. Clone it, configure it, and start building your feature — not the boilerplate.

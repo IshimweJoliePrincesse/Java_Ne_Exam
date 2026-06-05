@@ -5,4 +5,5 @@ public interface EmailService {
     void sendOtpEmail(String to, String fullName, String otp);
     void sendRoleChangedEmail(String to, String fullName, String message);
     void sendPasswordResetOtpEmail(String to, String fullName, String otp);
+    void sendFullPaymentEmail(String to, String fullName, String billReference);
 }

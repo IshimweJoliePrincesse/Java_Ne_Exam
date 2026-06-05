@@ -11,6 +11,7 @@ import com.utility.billing.exception.ResourceNotFoundException;
 import com.utility.billing.mapper.UtilityMappers;
 import com.utility.billing.repository.BillRepository;
 import com.utility.billing.repository.PaymentRepository;
+import com.utility.billing.service.EmailService;
 import com.utility.billing.service.PaymentService;
 import com.utility.billing.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BillRepository billRepository;
     private final UtilityMappers mapper;
+    private final EmailService emailService;
 
     @Override
     public PaymentResponse record(PaymentRequest request) {
@@ -41,7 +43,8 @@ public class PaymentServiceImpl implements PaymentService {
         }
         bill.setAmountPaid(bill.getAmountPaid() + request.amountPaid());
         bill.setOutstandingBalance(bill.getOutstandingBalance() - request.amountPaid());
-        bill.setStatus(bill.getOutstandingBalance() == 0 ? BillStatus.PAID : BillStatus.PARTIALLY_PAID);
+        boolean fullyPaid = bill.getOutstandingBalance() == 0;
+        bill.setStatus(fullyPaid ? BillStatus.PAID : BillStatus.PARTIALLY_PAID);
         Payment payment = Payment.builder()
                 .bill(bill)
                 .amountPaid(request.amountPaid())
@@ -50,7 +53,11 @@ public class PaymentServiceImpl implements PaymentService {
                 .recordedBy(SecurityUtils.currentUser())
                 .transactionReference(request.transactionReference())
                 .build();
-        return mapper.toPaymentResponse(paymentRepository.save(payment));
+        Payment savedPayment = paymentRepository.save(payment);
+        if (fullyPaid) {
+            emailService.sendFullPaymentEmail(bill.getCustomer().getEmail(), bill.getCustomer().getFullName(), bill.getBillReference());
+        }
+        return mapper.toPaymentResponse(savedPayment);
     }
 
     @Override

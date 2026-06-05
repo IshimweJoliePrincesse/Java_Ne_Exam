@@ -48,4 +48,10 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(to, "Utility Billing password reset",
                 "Dear " + fullName + ",\n\nYour password reset OTP is " + otp + ". It expires in 15 minutes.\n\nUtility Billing System");
     }
+
+    @Override
+    public void sendFullPaymentEmail(String to, String fullName, String billReference) {
+        sendEmail(to, "Utility bill fully paid",
+                "Dear " + fullName + ",\n\nYour bill " + billReference + " has been fully paid. Thank you!\n\nUtility Billing System");
+    }
 }

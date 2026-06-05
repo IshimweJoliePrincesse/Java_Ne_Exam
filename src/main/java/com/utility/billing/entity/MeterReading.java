@@ -5,14 +5,13 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "meter_readings", uniqueConstraints = @UniqueConstraint(name = "uk_meter_reading_month_year", columnNames = {"meter_id", "month", "year"}))
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class MeterReading {
-    @Id @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "meter_id", nullable = false)

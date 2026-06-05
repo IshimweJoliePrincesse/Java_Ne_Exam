@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,12 +24,12 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificationResponse> findByCustomer(UUID customerId) {
+    public List<NotificationResponse> findByCustomer(Long customerId) {
         return notificationRepository.findByCustomerIdOrderByCreatedAtDesc(customerId).stream().map(mapper::toNotificationResponse).toList();
     }
 
     @Override
-    public NotificationResponse markRead(UUID id) {
+    public NotificationResponse markRead(Long id) {
         Notification notification = notificationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
         var user = SecurityUtils.currentUser();
         if (user.getRole() == Role.ROLE_CUSTOMER && !notification.getCustomer().getEmail().equalsIgnoreCase(user.getEmail())) {

@@ -2,7 +2,6 @@ package com.utility.billing.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -46,11 +45,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     ResponseEntity<ErrorResponse> constraint(ConstraintViolationException ex, HttpServletRequest request) {
         return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request);
-    }
-
-    @ExceptionHandler(PropertyReferenceException.class)
-    ResponseEntity<ErrorResponse> invalidSort(PropertyReferenceException ex, HttpServletRequest request) {
-        return build(HttpStatus.BAD_REQUEST, "Invalid sort property: " + ex.getPropertyName(), request);
     }
 
     @ExceptionHandler(Exception.class)

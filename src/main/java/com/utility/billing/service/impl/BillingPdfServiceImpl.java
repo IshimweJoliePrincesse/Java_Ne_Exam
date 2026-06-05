@@ -19,7 +19,6 @@ import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,7 @@ public class BillingPdfServiceImpl implements BillingPdfService {
 
     @Override
     @Transactional(readOnly = true)
-    public byte[] generateBillPdf(UUID billId) {
+    public byte[] generateBillPdf(Long billId) {
         Bill bill = billRepository.findById(billId).orElseThrow(() -> new ResourceNotFoundException("Bill not found"));
         ensureCanDownload(bill);
 

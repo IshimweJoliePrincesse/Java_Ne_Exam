@@ -4,9 +4,8 @@ import com.utility.billing.entity.Meter;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.UUID;
 
-public interface MeterRepository extends JpaRepository<Meter, UUID> {
+public interface MeterRepository extends JpaRepository<Meter, Long> {
     boolean existsByMeterNumber(String meterNumber);
-    List<Meter> findByCustomerId(UUID customerId);
+    List<Meter> findByCustomerId(Long customerId);
 }

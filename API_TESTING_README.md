@@ -256,28 +256,7 @@ Expected:
 - Customer profile updates
 - Matching user full name and phone number also update
 
-### 3.3 Create Customer Manually
-
-Use admin or operator token.
-
-`POST /api/customers`
-
-```json
-{
-  "fullName": "Manual Customer",
-  "nationalId": "1198000000000004",
-  "email": "manual.customer@example.com",
-  "phoneNumber": "+250788222333",
-  "address": "Kigali, Kicukiro"
-}
-```
-
-Expected:
-
-- Customer created
-- Duplicate National ID returns `409 Conflict`
-
-### 3.4 List Customers
+### 3.3 List Customers
 
 Use admin or operator token.
 
@@ -298,7 +277,7 @@ Use admin or operator token.
 
 Expected:
 
-- Admin/operator can fetch customer by UUID
+- Admin/operator can fetch customer by integer ID
 - Customer should use `/api/customers/me` instead
 
 ### 3.6 Update Customer By ID

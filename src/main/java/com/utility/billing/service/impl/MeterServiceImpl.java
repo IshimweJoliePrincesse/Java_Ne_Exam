@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +50,7 @@ public class MeterServiceImpl implements MeterService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<MeterResponse> findByCustomer(UUID customerId) {
+    public List<MeterResponse> findByCustomer(Long customerId) {
         return meterRepository.findByCustomerId(customerId)
                 .stream()
                 .map(mapper::toMeterResponse)
@@ -59,7 +58,7 @@ public class MeterServiceImpl implements MeterService {
     }
 
     @Override
-    public MeterResponse updateStatus(UUID id, StatusRequest request) {
+    public MeterResponse updateStatus(Long id, StatusRequest request) {
         Meter meter = meterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Meter not found"));
         meter.setStatus(request.status());

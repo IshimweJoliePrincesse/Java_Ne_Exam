@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class CustomerDtos {
     public record CustomerRequest(
@@ -22,5 +21,5 @@ public class CustomerDtos {
             @NotBlank @Pattern(regexp = AuthDtos.PHONE_REGEX, message = "Phone number must start with + and contain 10 to 12 digits") String phoneNumber,
             @NotBlank @Size(min = 3, max = 255) String address) {}
     public record StatusRequest(@NotNull Status status) {}
-    public record CustomerResponse(UUID id, String fullName, String nationalId, String email, String phoneNumber, String address, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {}
+    public record CustomerResponse(Long id, String fullName, String nationalId, String email, String phoneNumber, String address, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {}
 }

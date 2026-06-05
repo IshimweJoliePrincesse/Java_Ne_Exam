@@ -6,14 +6,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 @Table(name = "meters")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Meter {
-    @Id @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String meterNumber;

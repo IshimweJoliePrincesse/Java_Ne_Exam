@@ -8,11 +8,10 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 public class TariffDtos {
     public record TariffTierRequest(@NotNull @PositiveOrZero Double minUnits, @PositiveOrZero Double maxUnits, @NotNull @Positive Double pricePerUnit) {}
-    public record TariffTierResponse(UUID id, Double minUnits, Double maxUnits, Double pricePerUnit) {}
+    public record TariffTierResponse(Long id, Double minUnits, Double maxUnits, Double pricePerUnit) {}
     public record TariffRequest(
             @NotBlank @Size(min = 3, max = 120) String name,
             @NotNull MeterType meterType,
@@ -23,5 +22,5 @@ public class TariffDtos {
             @NotNull @DecimalMax(value = "100.0") @PositiveOrZero Double latePenaltyPercent,
             @NotNull @FutureOrPresent LocalDate effectiveDate,
             @Valid List<TariffTierRequest> tiers) {}
-    public record TariffResponse(UUID id, String name, MeterType meterType, TariffType tariffType, Double pricePerUnit, Double fixedCharge, Double vatPercent, Double latePenaltyPercent, LocalDate effectiveDate, Boolean isActive, Integer version, LocalDateTime createdAt, List<TariffTierResponse> tiers) {}
+    public record TariffResponse(Long id, String name, MeterType meterType, TariffType tariffType, Double pricePerUnit, Double fixedCharge, Double vatPercent, Double latePenaltyPercent, LocalDate effectiveDate, Boolean isActive, Integer version, LocalDateTime createdAt, List<TariffTierResponse> tiers) {}
 }

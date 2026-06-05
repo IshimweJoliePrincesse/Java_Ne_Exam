@@ -4,10 +4,9 @@ import com.utility.billing.entity.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.UUID;
 
-public interface PaymentRepository extends JpaRepository<Payment, UUID> {
+public interface PaymentRepository extends JpaRepository<Payment, Long> {
     boolean existsByTransactionReference(String transactionReference);
-    List<Payment> findByBillIdOrderByCreatedAtDesc(UUID billId);
-    List<Payment> findByBillCustomerIdOrderByCreatedAtDesc(UUID customerId);
+    List<Payment> findByBillIdOrderByCreatedAtDesc(Long billId);
+    List<Payment> findByBillCustomerIdOrderByCreatedAtDesc(Long customerId);
 }

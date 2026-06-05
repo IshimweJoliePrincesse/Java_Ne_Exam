@@ -2,8 +2,8 @@ package com.utility.billing.service.impl;
 
 import com.utility.billing.dto.CustomerDtos.*;
 import com.utility.billing.entity.Customer;
+import com.utility.billing.enums.Role;
 import com.utility.billing.enums.Status;
-import com.utility.billing.exception.DuplicateResourceException;
 import com.utility.billing.exception.ResourceNotFoundException;
 import com.utility.billing.mapper.CustomerMapper;
 import com.utility.billing.repository.AppUserRepository;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,33 +28,28 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerMapper customerMapper;
 
     @Override
-    public CustomerResponse create(CustomerRequest request) {
-        if (customerRepository.existsByNationalId(request.nationalId())) {
-            throw new DuplicateResourceException("Customer national ID already exists");
-        }
-        Customer customer = Customer.builder()
-                .fullName(request.fullName()).nationalId(request.nationalId()).email(request.email())
-                .phoneNumber(request.phoneNumber()).address(request.address()).build();
-        return customerMapper.toResponse(customerRepository.save(customer));
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<CustomerResponse> findAll(String search) {
+        List<Customer> customers;
         if (search == null || search.isBlank()) {
-            return customerRepository.findAll().stream().map(customerMapper::toResponse).toList();
+            customers = customerRepository.findAll();
+        } else {
+            String term = "%" + search.toLowerCase() + "%";
+            Specification<Customer> spec = (root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("fullName")), term),
+                    cb.like(cb.lower(root.get("nationalId")), term),
+                    cb.like(cb.lower(root.get("phoneNumber")), term));
+            customers = customerRepository.findAll(spec);
         }
-        String term = "%" + search.toLowerCase() + "%";
-        Specification<Customer> spec = (root, query, cb) -> cb.or(
-                cb.like(cb.lower(root.get("fullName")), term),
-                cb.like(cb.lower(root.get("nationalId")), term),
-                cb.like(cb.lower(root.get("phoneNumber")), term));
-        return customerRepository.findAll(spec).stream().map(customerMapper::toResponse).toList();
+        return customers.stream()
+                .filter(this::belongsToCurrentCustomerRole)
+                .map(customerMapper::toResponse)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CustomerResponse findById(UUID id) {
+    public CustomerResponse findById(Long id) {
         return customerMapper.toResponse(get(id));
     }
 
@@ -66,7 +60,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerResponse update(UUID id, CustomerRequest request) {
+    public CustomerResponse update(Long id, CustomerRequest request) {
         Customer customer = get(id);
         customer.setFullName(request.fullName());
         customer.setEmail(request.email());
@@ -89,7 +83,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerResponse updateStatus(UUID id, StatusRequest request) {
+    public CustomerResponse updateStatus(Long id, StatusRequest request) {
         Customer customer = get(id);
         customer.setStatus(request.status());
         userRepository.findByEmail(customer.getEmail()).ifPresent(user -> user.setStatus(request.status()));
@@ -100,12 +94,18 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toResponse(customer);
     }
 
-    private Customer get(UUID id) {
+    private Customer get(Long id) {
         return customerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
     }
 
     private Customer getByCurrentUserEmail() {
         String email = SecurityUtils.currentUser().getEmail();
         return customerRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Customer profile not found"));
+    }
+
+    private boolean belongsToCurrentCustomerRole(Customer customer) {
+        return userRepository.findByEmail(customer.getEmail())
+                .map(user -> user.getRole() == Role.ROLE_CUSTOMER)
+                .orElse(false);
     }
 }

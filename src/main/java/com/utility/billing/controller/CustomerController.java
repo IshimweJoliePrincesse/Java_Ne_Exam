@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -18,13 +17,6 @@ import java.util.UUID;
 @Tag(name = "3. Customers", description = "Admins/operators manage customer records. Customer users can view and update their own profile.")
 public class CustomerController {
     private final CustomerService customerService;
-
-    @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
-    @Operation(summary = "Create customer", description = "Registers a new utility customer. National ID must be unique and exactly 16 digits.")
-    public CustomerResponse create(@Valid @RequestBody CustomerRequest request) {
-        return customerService.create(request);
-    }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
@@ -49,22 +41,22 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
-    @Operation(summary = "Get customer by ID", description = "Returns a single customer by UUID.")
-    public CustomerResponse findById(@PathVariable UUID id) {
+    @Operation(summary = "Get customer by ID", description = "Returns a single customer by Long.")
+    public CustomerResponse findById(@PathVariable Long id) {
         return customerService.findById(id);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
     @Operation(summary = "Update customer", description = "Updates customer contact and address information.")
-    public CustomerResponse update(@PathVariable UUID id, @Valid @RequestBody CustomerRequest request) {
+    public CustomerResponse update(@PathVariable Long id, @Valid @RequestBody CustomerRequest request) {
         return customerService.update(id, request);
     }
 
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Activate or deactivate customer", description = "Admin changes customer status. Deactivation also disables the matching user login and all meters owned by the customer.")
-    public CustomerResponse updateStatus(@PathVariable UUID id, @Valid @RequestBody StatusRequest request) {
+    public CustomerResponse updateStatus(@PathVariable Long id, @Valid @RequestBody StatusRequest request) {
         return customerService.updateStatus(id, request);
     }
 }

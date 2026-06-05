@@ -14,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -27,7 +26,7 @@ public class NotificationController {
     @GetMapping("/customer/{customerId}")
     @PreAuthorize("hasAnyRole('ADMIN','FINANCE','CUSTOMER')")
     @Operation(summary = "List customer notifications", description = "Returns notification messages for a customer. Customer users can only access their own notifications.")
-    public List<NotificationResponse> findByCustomer(@PathVariable UUID customerId) {
+    public List<NotificationResponse> findByCustomer(@PathVariable Long customerId) {
         ensureOwnCustomerIfCustomer(customerId);
         return notificationService.findByCustomer(customerId);
     }
@@ -35,11 +34,11 @@ public class NotificationController {
     @PatchMapping("/{id}/read")
     @PreAuthorize("hasAnyRole('ADMIN','FINANCE','CUSTOMER')")
     @Operation(summary = "Mark notification as read", description = "Marks one notification as read. Customer users can only update their own notifications.")
-    public NotificationResponse markRead(@PathVariable UUID id) {
+    public NotificationResponse markRead(@PathVariable Long id) {
         return notificationService.markRead(id);
     }
 
-    private void ensureOwnCustomerIfCustomer(UUID customerId) {
+    private void ensureOwnCustomerIfCustomer(Long customerId) {
         var user = SecurityUtils.currentUser();
         if (user.getRole() == Role.ROLE_CUSTOMER) {
             var customer = customerRepository.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("Customer not found"));

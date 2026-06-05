@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/tariffs")
@@ -43,7 +42,7 @@ public class TariffController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create new tariff version", description = "Updates a tariff by creating a new version and deactivating the old one.")
-    public TariffResponse update(@PathVariable UUID id, @Valid @RequestBody TariffRequest request) {
+    public TariffResponse update(@PathVariable Long id, @Valid @RequestBody TariffRequest request) {
         return tariffService.update(id, request);
     }
 }

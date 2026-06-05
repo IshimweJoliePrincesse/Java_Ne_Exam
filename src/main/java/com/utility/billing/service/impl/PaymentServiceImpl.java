@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -62,13 +61,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PaymentResponse> findByBill(UUID billId) {
+    public List<PaymentResponse> findByBill(Long billId) {
         return paymentRepository.findByBillIdOrderByCreatedAtDesc(billId).stream().map(mapper::toPaymentResponse).toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PaymentResponse> findByCustomer(UUID customerId) {
+    public List<PaymentResponse> findByCustomer(Long customerId) {
         return paymentRepository.findByBillCustomerIdOrderByCreatedAtDesc(customerId).stream().map(mapper::toPaymentResponse).toList();
     }
 }

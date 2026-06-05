@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/meter-readings")
@@ -35,15 +34,15 @@ public class MeterReadingController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','FINANCE','OPERATOR')")
-    @Operation(summary = "Get reading by ID", description = "Returns a single meter reading by UUID.")
-    public MeterReadingResponse findById(@PathVariable UUID id) {
+    @Operation(summary = "Get reading by ID", description = "Returns a single meter reading by Long.")
+    public MeterReadingResponse findById(@PathVariable Long id) {
         return meterReadingService.findById(id);
     }
 
     @GetMapping("/meter/{meterId}")
     @PreAuthorize("hasAnyRole('ADMIN','FINANCE','OPERATOR')")
     @Operation(summary = "List readings by meter", description = "Returns reading history for one meter, newest first.")
-    public List<MeterReadingResponse> findByMeter(@PathVariable UUID meterId) {
+    public List<MeterReadingResponse> findByMeter(@PathVariable Long meterId) {
         return meterReadingService.findByMeter(meterId);
     }
 }

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -67,14 +66,14 @@ public class MeterReadingServiceImpl implements MeterReadingService {
 
     @Override
     @Transactional(readOnly = true)
-    public MeterReadingResponse findById(UUID id) {
+    public MeterReadingResponse findById(Long id) {
         return mapper.toReadingResponse(readingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Meter reading not found")));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<MeterReadingResponse> findByMeter(UUID meterId) {
+    public List<MeterReadingResponse> findByMeter(Long meterId) {
         return readingRepository.findByMeterIdOrderByReadingDateDesc(meterId)
                 .stream()
                 .map(mapper::toReadingResponse)

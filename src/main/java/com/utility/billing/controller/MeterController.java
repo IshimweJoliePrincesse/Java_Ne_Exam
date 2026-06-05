@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/meters")
@@ -35,13 +34,13 @@ public class MeterController {
 
     @GetMapping("/customer/{customerId}")
     @Operation(summary = "List customer meters", description = "Returns all meters assigned to a specific customer.")
-    public List<MeterResponse> findByCustomer(@PathVariable UUID customerId) {
+    public List<MeterResponse> findByCustomer(@PathVariable Long customerId) {
         return meterService.findByCustomer(customerId);
     }
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Activate or deactivate meter", description = "Changes meter status. Inactive meters cannot receive new readings.")
-    public MeterResponse updateStatus(@PathVariable UUID id, @Valid @RequestBody StatusRequest request) {
+    public MeterResponse updateStatus(@PathVariable Long id, @Valid @RequestBody StatusRequest request) {
         return meterService.updateStatus(id, request);
     }
 }

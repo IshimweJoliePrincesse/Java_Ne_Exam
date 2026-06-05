@@ -58,7 +58,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Delete user", description = "Admin permanently deletes a user account by UUID.")
+    @Operation(summary = "Delete user", description = "Admin permanently deletes a user account by Long.")
     public void delete(@PathVariable Long id) {
         userService.delete(id);
     }

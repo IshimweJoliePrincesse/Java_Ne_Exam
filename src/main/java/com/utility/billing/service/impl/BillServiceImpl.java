@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -34,7 +33,7 @@ public class BillServiceImpl implements BillService {
     private final UtilityMappers mapper;
 
     @Override
-    public BillResponse generate(UUID meterReadingId) {
+    public BillResponse generate(Long meterReadingId) {
         if (billRepository.existsByMeterReadingId(meterReadingId)) {
             throw new DuplicateResourceException("A bill already exists for this meter reading");
         }
@@ -72,7 +71,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillResponse approve(UUID id) {
+    public BillResponse approve(Long id) {
         Bill bill = get(id);
         bill.setStatus(BillStatus.APPROVED);
         bill.setApprovedBy(SecurityUtils.currentUser());
@@ -87,13 +86,13 @@ public class BillServiceImpl implements BillService {
 
     @Override
     @Transactional(readOnly = true)
-    public BillResponse findById(UUID id) {
+    public BillResponse findById(Long id) {
         return mapper.toBillResponse(get(id));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BillSummaryResponse> findByCustomer(UUID customerId) {
+    public List<BillSummaryResponse> findByCustomer(Long customerId) {
         return billRepository.findByCustomerIdOrderByCreatedAtDesc(customerId).stream().map(mapper::toBillSummary).toList();
     }
 
@@ -114,7 +113,7 @@ public class BillServiceImpl implements BillService {
         }).sum();
     }
 
-    private Bill get(UUID id) {
+    private Bill get(Long id) {
         return billRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bill not found"));
     }
 

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +45,7 @@ public class TariffServiceImpl implements TariffService {
     }
 
     @Override
-    public TariffResponse update(UUID id, TariffRequest request) {
+    public TariffResponse update(Long id, TariffRequest request) {
         Tariff old = tariffRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tariff not found"));
         old.setIsActive(false);
         validateTiers(request);

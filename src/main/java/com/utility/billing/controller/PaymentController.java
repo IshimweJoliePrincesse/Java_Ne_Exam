@@ -15,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -42,19 +41,19 @@ public class PaymentController {
     @GetMapping("/bill/{billId}")
     @PreAuthorize("hasAnyRole('ADMIN','FINANCE')")
     @Operation(summary = "List payments by bill", description = "Returns all payments recorded for a specific bill.")
-    public List<PaymentResponse> findByBill(@PathVariable UUID billId) {
+    public List<PaymentResponse> findByBill(@PathVariable Long billId) {
         return paymentService.findByBill(billId);
     }
 
     @GetMapping("/customer/{customerId}")
     @PreAuthorize("hasAnyRole('ADMIN','FINANCE','CUSTOMER')")
     @Operation(summary = "List customer payment history", description = "Returns payment history for a customer. Customer users can only access their own payments.")
-    public List<PaymentResponse> findByCustomer(@PathVariable UUID customerId) {
+    public List<PaymentResponse> findByCustomer(@PathVariable Long customerId) {
         ensureOwnCustomerIfCustomer(customerId);
         return paymentService.findByCustomer(customerId);
     }
 
-    private void ensureOwnCustomerIfCustomer(UUID customerId) {
+    private void ensureOwnCustomerIfCustomer(Long customerId) {
         var user = SecurityUtils.currentUser();
         if (user.getRole() == Role.ROLE_CUSTOMER) {
             var customer = customerRepository.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("Customer not found"));

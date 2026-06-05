@@ -108,7 +108,7 @@ flowchart LR
 
 - Auth: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/verify-otp`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`
 - Users: `GET /api/users`, `GET /api/users/me`, `GET /api/users/{id}`, `PATCH /api/users/{id}/role`, `PATCH /api/users/{id}/role/revoke`, `DELETE /api/users/{id}`
-- Customers: `POST /api/customers`, `GET /api/customers`, `GET /api/customers/me`, `PUT /api/customers/me`, `GET /api/customers/{id}`, `PUT /api/customers/{id}`, `PATCH /api/customers/{id}/status`
+- Customers: `GET /api/customers`, `GET /api/customers/me`, `PUT /api/customers/me`, `GET /api/customers/{id}`, `PUT /api/customers/{id}`, `PATCH /api/customers/{id}/status`
 - Meters: `POST /api/meters`, `GET /api/meters`, `GET /api/meters/customer/{customerId}`, `PATCH /api/meters/{id}/status`
 - Meter Readings: `POST /api/meter-readings`, `GET /api/meter-readings`, `GET /api/meter-readings/{id}`, `GET /api/meter-readings/meter/{meterId}`
 - Tariffs: `POST /api/tariffs`, `GET /api/tariffs`, `GET /api/tariffs/active`, `PUT /api/tariffs/{id}`

@@ -5,10 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public interface BillRepository extends JpaRepository<Bill, UUID> {
-    boolean existsByMeterReadingId(UUID meterReadingId);
+public interface BillRepository extends JpaRepository<Bill, Long> {
+    boolean existsByMeterReadingId(Long meterReadingId);
     Optional<Bill> findByBillReference(String billReference);
-    List<Bill> findByCustomerIdOrderByCreatedAtDesc(UUID customerId);
+    List<Bill> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
 }

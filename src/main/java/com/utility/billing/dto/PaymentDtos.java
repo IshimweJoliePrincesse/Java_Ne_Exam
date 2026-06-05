@@ -10,14 +10,13 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class PaymentDtos {
     public record PaymentRequest(
-            @NotNull UUID billId,
+            @NotNull Long billId,
             @NotNull @Positive Double amountPaid,
             @NotNull PaymentMethod paymentMethod,
             @NotNull @PastOrPresent LocalDate paymentDate,
             @NotBlank @Size(min = 4, max = 120) @Pattern(regexp = "^[A-Za-z0-9-]+$", message = "Transaction reference can contain letters, numbers, and hyphens only") String transactionReference) {}
-    public record PaymentResponse(UUID id, UUID billId, String billReference, Double amountPaid, PaymentMethod paymentMethod, LocalDate paymentDate, Long recordedById, String recordedByName, String transactionReference, LocalDateTime createdAt) {}
+    public record PaymentResponse(Long id, Long billId, String billReference, Double amountPaid, PaymentMethod paymentMethod, LocalDate paymentDate, Long recordedById, String recordedByName, String transactionReference, LocalDateTime createdAt) {}
 }
